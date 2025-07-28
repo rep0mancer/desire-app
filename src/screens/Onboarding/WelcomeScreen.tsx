@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Button } from '@components/common/Button';
 import { ScreenContainer } from '@components/layout/ScreenContainer';
 import { OnboardingStackParamList } from '@navigation/AppNavigator';
+import { ROUTES } from '@constants/navigation';
 import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
 
@@ -25,12 +26,12 @@ const WelcomeScreen: React.FC = () => {
         <View style={styles.buttonContainer}>
           <Button
             label="Lazy Setup"
-            onPress={() => navigation.navigate('Archetype')}
+            onPress={() => navigation.navigate(ROUTES.ARCHETYPE)}
             style={styles.button}
           />
           <Button
             label="Advanced Setup"
-            onPress={() => navigation.navigate('AdvancedSetup')}
+            onPress={() => navigation.navigate(ROUTES.ADVANCED_SETUP)}
             style={styles.button}
           />
         </View>

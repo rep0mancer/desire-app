@@ -35,6 +35,6 @@
     "firebaseStorageBucket": "<YOUR_STORAGE_BUCKET>",
     "firebaseMessagingSenderId": "<YOUR_SENDER_ID>",
     "firebaseAppId": "<YOUR_APP_ID>",
-    "spoonacularProxyUrl": "<YOUR_BACKEND_PROXY_URL>"
+    "spoonacularProxyUrl": "https://example.com/proxy"
   }
 }

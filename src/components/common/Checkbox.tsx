@@ -8,13 +8,9 @@ import { fonts, sizes } from '@constants/typography';
  */
 interface CheckboxProps {
   /** Current checked state. */
-  checked?: boolean;
-  /** Alternative prop name for checked state. */
-  isChecked?: boolean;
+  checked: boolean;
   /** Callback invoked when the user toggles the checkbox. */
-  onToggle?: () => void;
-  /** Alternate press handler prop name. */
-  onPress?: () => void;
+  onToggle: () => void;
   /** Label displayed next to the checkbox. */
   label: string;
   /** Optional additional styles applied to the outer container. */
@@ -27,13 +23,11 @@ interface CheckboxProps {
  * A simple checkbox with a label. It maintains no internal state; use the
  * provided `checked` prop to control its appearance.
  */
-export const Checkbox: React.FC<CheckboxProps> = ({ checked, isChecked, onToggle, onPress, label, style, muted }) => {
-  const actualChecked = typeof isChecked === 'boolean' ? isChecked : !!checked;
-  const handlePress = onToggle || onPress || (() => {});
+export const Checkbox: React.FC<CheckboxProps> = ({ checked, onToggle, label, style, muted }) => {
   return (
-    <Pressable style={[styles.container, style]} onPress={handlePress}>
-      <Pressable style={[styles.box, actualChecked && styles.boxChecked]}>
-        {actualChecked && <Text style={styles.check}>✓</Text>}
+    <Pressable style={[styles.container, style]} onPress={onToggle}>
+      <Pressable style={[styles.box, checked && styles.boxChecked]}>
+        {checked && <Text style={styles.check}>✓</Text>}
       </Pressable>
       <Text style={[styles.label, muted && styles.mutedLabel]}>{label}</Text>
     </Pressable>

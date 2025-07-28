@@ -12,8 +12,9 @@ import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
 import { useToast } from '@components/common/Toast';
 import { Button } from '@components/common/Button';
+import { ROUTES } from '@constants/navigation';
 
-type Props = NativeStackScreenProps<MainStackParamList, 'PantryManagement'>;
+type Props = NativeStackScreenProps<MainStackParamList, typeof ROUTES.PANTRY_MANAGEMENT>;
 
 /**
  * Screen that allows the user to view and modify their current pantry.
@@ -42,7 +43,7 @@ const PantryManagementScreen: React.FC<Props> = () => {
       userActions.setPantryLastUpdated(timestamp);
       setInput('');
     } catch (error) {
-      console.error(error);
+      // Show error via toast; avoid logging sensitive errors to console
       showToast('Failed to add item');
     }
   };
@@ -59,7 +60,7 @@ const PantryManagementScreen: React.FC<Props> = () => {
       await updateUserProfile(userId, { pantryLastUpdated: timestamp });
       userActions.setPantryLastUpdated(timestamp);
     } catch (error) {
-      console.error(error);
+      // Show error via toast; avoid logging sensitive errors to console
       showToast('Failed to remove item');
     }
   };
@@ -79,7 +80,7 @@ const PantryManagementScreen: React.FC<Props> = () => {
         <Button label="Add" onPress={handleAdd} style={styles.addButton} />
       </View>
       <ScrollView contentContainerStyle={styles.listContainer}>
-        {items.map((item: string) => (
+        {Object.keys(items).map((item: string) => (
           <View key={item} style={styles.itemRow}>
             <Text style={styles.itemText}>{item}</Text>
             <TouchableOpacity onPress={() => handleRemove(item)}>
@@ -87,7 +88,7 @@ const PantryManagementScreen: React.FC<Props> = () => {
             </TouchableOpacity>
           </View>
         ))}
-        {items.length === 0 && (
+        {Object.keys(items).length === 0 && (
           <Text style={styles.empty}>Your pantry is empty. Start adding items!</Text>
         )}
       </ScrollView>
@@ -115,8 +116,10 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.secondaryText,
+    // Use thicker underline and no border radius per brutalist spec
+    borderRadius: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.primaryText,
     paddingVertical: 8,
     fontFamily: fonts.body,
     fontSize: sizes.body,

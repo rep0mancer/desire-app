@@ -5,14 +5,19 @@ import create from 'zustand';
  */
 export interface PantryState {
   /** The list of ingredient names currently stored in the user's pantry. */
-  items: string[];
+  items: Record<string, boolean>;
   actions: {
-    /** Replace the entire pantry with a new array of items. */
-    setPantry: (items: string[]) => void;
+    /** Replace the entire pantry with a new set of items. */
+    setPantry: (items: Record<string, boolean>) => void;
     /** Add a single item to the pantry. */
     addItem: (item: string) => void;
     /** Remove a single item from the pantry. */
     removeItem: (item: string) => void;
+    /**
+     * Reset the pantry back to an empty list. This should be used when
+     * signing out or switching accounts to ensure no stale data remains.
+     */
+    resetPantry: () => void;
   };
 }
 
@@ -22,10 +27,19 @@ export interface PantryState {
  * subscribe to `items` to reactively update when the pantry changes.
  */
 export const usePantryStore = create<PantryState>((set) => ({
-  items: [],
+  items: {},
   actions: {
-    setPantry: (items: string[]) => set({ items }),
-    addItem: (item: string) => set((state: PantryState) => ({ items: [...state.items, item.toLowerCase()] })),
-    removeItem: (item: string) => set((state: PantryState) => ({ items: state.items.filter((i) => i !== item.toLowerCase()) })),
+    setPantry: (items: Record<string, boolean>) => set({ items }),
+    addItem: (item: string) =>
+      set((state: PantryState) => ({
+        items: { ...state.items, [item.toLowerCase()]: true },
+      })),
+    removeItem: (item: string) =>
+      set((state: PantryState) => {
+        const updated = { ...state.items };
+        delete updated[item.toLowerCase()];
+        return { items: updated };
+      }),
+    resetPantry: () => set({ items: {} }),
   },
 }));

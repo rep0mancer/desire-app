@@ -26,6 +26,9 @@
     },
     "web": {
       "favicon": "./assets/app-icon.png"
+    },
+    "extra": {
+      "spoonacularProxyUrl": "https://example.com/proxy"
     }
   }
 }

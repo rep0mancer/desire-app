@@ -16,7 +16,7 @@ export function usePantryComparison(ingredients: string[]) {
     const need: string[] = [];
     ingredients.forEach((item) => {
       const lower = item.toLowerCase();
-      if (pantry.includes(lower)) {
+      if (pantry[lower]) {
         have.push(item);
       } else {
         need.push(item);

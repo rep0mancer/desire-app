@@ -5,10 +5,12 @@ import {
   setDoc,
   deleteDoc,
   updateDoc,
+  getDoc,
   Firestore,
   Timestamp,
 } from 'firebase/firestore';
 import { getDatabase } from '@config/firebase';
+import { showToast } from '@utils/toastService';
 
 /**
  * Data shape for a user's profile document in Firestore.
@@ -40,7 +42,7 @@ export async function getUserPantry(userId: string): Promise<string[]> {
     const snapshot = await getDocs(pantryCollection(db, userId));
     return snapshot.docs.map(doc => doc.id);
   } catch (error) {
-    console.error('getUserPantry error', error);
+    showToast('Failed to retrieve pantry');
     throw new Error('Failed to retrieve pantry');
   }
 }
@@ -57,7 +59,7 @@ export async function addItemToPantry(userId: string, item: string): Promise<voi
   try {
     await setDoc(doc(db, 'users', userId, 'pantry', item.toLowerCase()), { name: item.toLowerCase() });
   } catch (error) {
-    console.error('addItemToPantry error', error);
+    showToast('Failed to add item to pantry');
     throw new Error('Failed to add item to pantry');
   }
 }
@@ -73,7 +75,7 @@ export async function removeItemFromPantry(userId: string, item: string): Promis
   try {
     await deleteDoc(doc(db, 'users', userId, 'pantry', item.toLowerCase()));
   } catch (error) {
-    console.error('removeItemFromPantry error', error);
+    showToast('Failed to remove item from pantry');
     throw new Error('Failed to remove item from pantry');
   }
 }
@@ -90,7 +92,28 @@ export async function updateUserProfile(userId: string, data: Partial<UserProfil
   try {
     await setDoc(doc(db, 'users', userId, 'profile'), data, { merge: true });
   } catch (error) {
-    console.error('updateUserProfile error', error);
+    showToast('Failed to update user profile');
     throw new Error('Failed to update user profile');
+  }
+}
+
+/**
+ * Fetch a user's profile document from Firestore. If no document exists,
+ * `null` is returned.
+ *
+ * @param userId - Unique identifier of the user
+ * @returns The user's profile data or `null` if not found
+ */
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  const db = getDatabase();
+  try {
+    const snapshot = await getDoc(doc(db, 'users', userId, 'profile'));
+    if (snapshot.exists()) {
+      return snapshot.data() as UserProfile;
+    }
+    return null;
+  } catch (error) {
+    showToast('Failed to fetch user profile');
+    throw new Error('Failed to fetch user profile');
   }
 }

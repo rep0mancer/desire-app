@@ -23,7 +23,12 @@ interface RecipeCardProps {
  */
 export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onPress, style }) => {
   return (
-    <Pressable onPress={onPress} style={[styles.container, style]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityLabel={`Recipe for ${recipe.title}`}
+      accessibilityRole="button"
+      style={[styles.container, style]}
+    >
       <ImageBackground source={{ uri: recipe.image }} style={styles.image} imageStyle={styles.imageStyle}>
         <View style={styles.overlay}>
           <Text style={styles.title} numberOfLines={2}>{recipe.title}</Text>

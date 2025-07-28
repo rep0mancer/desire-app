@@ -11,7 +11,8 @@ export const Input: React.FC<TextInputProps> = (props) => {
   return (
     <TextInput
       style={[styles.input, props.style]}
-      placeholderTextColor={colors.secondaryText}
+      // Override placeholder colour to a darker grey as specified
+      placeholderTextColor="#666666"
       {...props}
     />
   );
@@ -19,8 +20,10 @@ export const Input: React.FC<TextInputProps> = (props) => {
 
 const styles = StyleSheet.create({
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.secondaryText,
+    // Sharp edges and thick underline for brutalist aesthetic
+    borderRadius: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.primaryText,
     paddingVertical: 8,
     color: colors.primaryText,
     fontFamily: fonts.body,
