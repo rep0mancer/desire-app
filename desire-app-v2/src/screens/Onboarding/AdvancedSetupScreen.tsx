@@ -13,8 +13,9 @@ import type { PantryState } from '@store/pantryStore';
 import { useUserStore } from '@store/userStore';
 import type { UserState } from '@store/userStore';
 import { useToast } from '@components/common/Toast';
+import { ROUTES } from '@constants/navigation';
 
-type Props = NativeStackScreenProps<OnboardingStackParamList, 'AdvancedSetup'>;
+type Props = NativeStackScreenProps<OnboardingStackParamList, typeof ROUTES.ADVANCED_SETUP>;
 
 /**
  * Static category definitions for the advanced setup screen. In a real app
@@ -62,15 +63,19 @@ const AdvancedSetupScreen: React.FC<Props> = ({ navigation }) => {
         return;
       }
       await Promise.all(selected.map((item) => addItemToPantry(userId, item)));
-      pantryActions.setPantry(selected.map((i) => i.toLowerCase()));
+      const pantryObj: Record<string, boolean> = {};
+      selected.forEach((i) => {
+        pantryObj[i.toLowerCase()] = true;
+      });
+      pantryActions.setPantry(pantryObj);
       const timestamp = Date.now();
       await updateUserProfile(userId, {
         pantryLastUpdated: timestamp,
       });
       userActions.setPantryLastUpdated(timestamp);
-      await userActions.setHasOnboarded(true);
+      await userActions.setOnboardingStep('finished');
       userActions.resetInactiveOpens();
-      navigation.reset({ index: 0, routes: [{ name: 'Home' as never }] });
+      navigation.reset({ index: 0, routes: [{ name: ROUTES.HOME as never }] });
     } catch (error) {
       // Notify the user of the failure; avoid console.log in production
       showToast('Failed to save pantry');

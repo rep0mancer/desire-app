@@ -8,8 +8,9 @@ import { RecipeCard } from '@components/common/RecipeCard';
 import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
 import { useToast } from '@components/common/Toast';
+import { ROUTES } from '@constants/navigation';
 
-type Props = NativeStackScreenProps<MainStackParamList, 'Results'>;
+type Props = NativeStackScreenProps<MainStackParamList, typeof ROUTES.RESULTS>;
 
 /**
  * Screen that presents search results fetched from the Spoonacular API. It
@@ -48,7 +49,7 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
     try {
       const details = await getRecipeDetails(recipe.id);
       const ingredientNames = details.extendedIngredients.map((ing) => ing.name);
-      navigation.navigate('ShoppingList', { title: recipe.title, ingredients: ingredientNames });
+      navigation.navigate(ROUTES.SHOPPING_LIST, { title: recipe.title, ingredients: ingredientNames });
     } catch (error) {
       showToast('Failed to fetch recipe details');
       // The ResultsScreen itself does not display details errors; rely on toast

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useAuth } from '@hooks/useAuth';
 import { useUserStore } from '@store/userStore';
+import { ROUTES } from '@constants/navigation';
 
 // Screen imports
 import WelcomeScreen from '@screens/Onboarding/WelcomeScreen';
@@ -19,17 +20,17 @@ import SignUpScreen from '@screens/Auth/SignUpScreen';
 
 // Navigation parameter lists
 export type OnboardingStackParamList = {
-  Welcome: undefined;
-  Archetype: undefined;
-  Checklist: { archetype: string; ingredients: string[] };
-  AdvancedSetup: undefined;
+  [ROUTES.WELCOME]: undefined;
+  [ROUTES.ARCHETYPE]: undefined;
+  [ROUTES.CHECKLIST]: { archetype: string; ingredients: string[] };
+  [ROUTES.ADVANCED_SETUP]: undefined;
 };
 
 export type MainStackParamList = {
-  Home: undefined;
-  Results: { query: string };
-  ShoppingList: { title: string; ingredients: string[] };
-  PantryManagement: undefined;
+  [ROUTES.HOME]: undefined;
+  [ROUTES.RESULTS]: { query: string };
+  [ROUTES.SHOPPING_LIST]: { title: string; ingredients: string[] };
+  [ROUTES.PANTRY_MANAGEMENT]: undefined;
 };
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
@@ -38,7 +39,7 @@ const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 /**
  * The root navigator decides whether to present the onboarding or main flow
- * based on the `hasOnboarded` flag from the user store. It also ensures
+ * based on the `onboardingStep` value from the user store. It also ensures
  * that asynchronous state (e.g. from AsyncStorage) is loaded before
  * rendering any screens.
  */
@@ -50,7 +51,19 @@ const MainStack = createNativeStackNavigator<MainStackParamList>();
  */
 export const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
-  const hasOnboarded = useUserStore((state) => state.hasOnboarded);
+  const onboardingStep = useUserStore((state) => state.onboardingStep);
+  const archetype = useUserStore((state) => state.onboardingArchetype);
+
+  const getInitialOnboardingRoute = () => {
+    switch (onboardingStep) {
+      case 'archetype_selected':
+        return ROUTES.CHECKLIST;
+      case 'pantry_complete':
+        return ROUTES.ADVANCED_SETUP;
+      default:
+        return ROUTES.WELCOME;
+    }
+  };
 
   if (loading) {
     // Display a centred loading indicator while checking auth state
@@ -68,33 +81,33 @@ export const AppNavigator: React.FC = () => {
       {!user ? (
         // User is not authenticated; present auth screens
         <AuthStack.Navigator
-          initialRouteName="Login"
+          initialRouteName={ROUTES.LOGIN}
           screenOptions={{ headerShown: false }}
         >
-          <AuthStack.Screen name="Login" component={LoginScreen} />
-          <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+          <AuthStack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
+          <AuthStack.Screen name={ROUTES.SIGN_UP} component={SignUpScreen} />
         </AuthStack.Navigator>
-      ) : !hasOnboarded ? (
-        // Authenticated but not onboarded
+      ) : onboardingStep !== 'finished' ? (
+        // Authenticated but mid-onboarding
         <OnboardingStack.Navigator
-          initialRouteName="Welcome"
+          initialRouteName={getInitialOnboardingRoute()}
           screenOptions={{ headerShown: false }}
         >
-          <OnboardingStack.Screen name="Welcome" component={WelcomeScreen} />
-          <OnboardingStack.Screen name="Archetype" component={ArchetypeScreen} />
-          <OnboardingStack.Screen name="Checklist" component={ChecklistScreen} />
-          <OnboardingStack.Screen name="AdvancedSetup" component={AdvancedSetupScreen} />
+          <OnboardingStack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
+          <OnboardingStack.Screen name={ROUTES.ARCHETYPE} component={ArchetypeScreen} />
+          <OnboardingStack.Screen name={ROUTES.CHECKLIST} component={ChecklistScreen} />
+          <OnboardingStack.Screen name={ROUTES.ADVANCED_SETUP} component={AdvancedSetupScreen} />
         </OnboardingStack.Navigator>
       ) : (
         // Authenticated and onboarded
         <MainStack.Navigator
-          initialRouteName="Home"
+          initialRouteName={ROUTES.HOME}
           screenOptions={{ headerShown: false }}
         >
-          <MainStack.Screen name="Home" component={HomeScreen} />
-          <MainStack.Screen name="Results" component={ResultsScreen} />
-          <MainStack.Screen name="ShoppingList" component={ShoppingListScreen} />
-          <MainStack.Screen name="PantryManagement" component={PantryManagementScreen} />
+          <MainStack.Screen name={ROUTES.HOME} component={HomeScreen} />
+          <MainStack.Screen name={ROUTES.RESULTS} component={ResultsScreen} />
+          <MainStack.Screen name={ROUTES.SHOPPING_LIST} component={ShoppingListScreen} />
+          <MainStack.Screen name={ROUTES.PANTRY_MANAGEMENT} component={PantryManagementScreen} />
         </MainStack.Navigator>
       )}
     </NavigationContainer>
@@ -106,8 +119,8 @@ export const AppNavigator: React.FC = () => {
  * login and sign up screens.
  */
 export type AuthStackParamList = {
-  Login: undefined;
-  SignUp: undefined;
+  [ROUTES.LOGIN]: undefined;
+  [ROUTES.SIGN_UP]: undefined;
 };
 
 /**

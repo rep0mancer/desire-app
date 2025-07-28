@@ -4,11 +4,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /**
  * Interface describing the shape of the user state held in the Zustand store.
  */
+export type OnboardingStep =
+  | 'unstarted'
+  | 'archetype_selected'
+  | 'pantry_complete'
+  | 'finished';
+
 export interface UserState {
   /** Unique identifier for the user. */
   userId: string | null;
-  /** Flag indicating whether the onboarding flow has been completed. */
-  hasOnboarded: boolean;
+  /** Tracks progress through the onboarding flow. */
+  onboardingStep: OnboardingStep;
   /** The archetype chosen during onboarding, if any. */
   onboardingArchetype: string | null;
   /** Unix timestamp (milliseconds) of when the pantry was last updated. */
@@ -18,8 +24,8 @@ export interface UserState {
   actions: {
     /** Persist the user ID into state. */
     setUserId: (id: string) => void;
-    /** Persist the onboarding flag both in memory and AsyncStorage. */
-    setHasOnboarded: (value: boolean) => Promise<void>;
+    /** Persist the onboarding step both in memory and AsyncStorage. */
+    setOnboardingStep: (step: OnboardingStep) => Promise<void>;
     /** Store the selected archetype in memory. */
     setOnboardingArchetype: (value: string | null) => void;
     /** Update the timestamp of the last pantry update. */
@@ -46,28 +52,28 @@ export interface UserState {
  */
 export const useUserStore = create<UserState>((set) => ({
   userId: null,
-  hasOnboarded: false,
+  onboardingStep: 'unstarted',
   onboardingArchetype: null,
   pantryLastUpdated: null,
   consecutiveInactiveOpens: 0,
   actions: {
     setUserId: (id: string) => set({ userId: id }),
-    setHasOnboarded: async (value: boolean) => {
-      await AsyncStorage.setItem('hasOnboarded', value ? 'true' : 'false');
-      set({ hasOnboarded: value });
+    setOnboardingStep: async (step: OnboardingStep) => {
+      await AsyncStorage.setItem('onboardingStep', step);
+      set({ onboardingStep: step });
     },
     setOnboardingArchetype: (value: string | null) => set({ onboardingArchetype: value }),
     setPantryLastUpdated: (timestamp: number) => set({ pantryLastUpdated: timestamp }),
     incrementInactiveOpens: () => set((state: UserState) => ({ consecutiveInactiveOpens: state.consecutiveInactiveOpens + 1 })),
     resetInactiveOpens: () => set({ consecutiveInactiveOpens: 0 }),
     loadFromStorage: async () => {
-      const flag = await AsyncStorage.getItem('hasOnboarded');
-      set({ hasOnboarded: flag === 'true' });
+      const step = await AsyncStorage.getItem('onboardingStep');
+      set({ onboardingStep: (step as OnboardingStep) || 'unstarted' });
     },
     resetUser: () =>
       set({
         userId: null,
-        hasOnboarded: false,
+        onboardingStep: 'unstarted',
         onboardingArchetype: null,
         pantryLastUpdated: null,
         consecutiveInactiveOpens: 0,

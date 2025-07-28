@@ -22,7 +22,12 @@ interface ButtonProps {
  */
 export const Button: React.FC<ButtonProps> = ({ label, onPress, style }) => {
   return (
-    <Pressable style={({ pressed }) => [styles.button, style, pressed && styles.pressed]} onPress={onPress}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed }) => [styles.button, style, pressed && styles.pressed]}
+      onPress={onPress}
+    >
       <Text style={styles.label}>{label}</Text>
     </Pressable>
   );

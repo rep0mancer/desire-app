@@ -9,6 +9,7 @@ import { fonts, sizes } from '@constants/typography';
 import { getAuthInstance } from '@config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@components/common/Toast';
+import { ROUTES } from '@constants/navigation';
 
 /**
  * Screen allowing an existing user to sign into their account. Presents
@@ -16,7 +17,7 @@ import { useToast } from '@components/common/Toast';
  * authentication succeeds, Firebase will handle navigation via the
  * `useAuth` hook in the AppNavigator.
  */
-export type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
+export type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.LOGIN>;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -60,7 +61,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         style={styles.input}
       />
       <Button label={isLoading ? 'Signing In...' : 'Sign In'} onPress={handleLogin} style={styles.button} />
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+      <TouchableOpacity onPress={() => navigation.navigate(ROUTES.SIGN_UP)}>
         <Text style={styles.linkText}>Don’t have an account? Sign up</Text>
       </TouchableOpacity>
     </View>

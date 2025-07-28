@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, Text, TextInput, Image, Pressable } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@navigation/AppNavigator';
 import { ScreenContainer } from '@components/layout/ScreenContainer';
 import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
-import { useUserStore } from '@store/userStore';
-import type { UserState } from '@store/userStore';
-import { markSearchPerformed } from '@utils/sessionService';
+import { useHomeScreenData } from '@hooks/useHomeScreenData';
+import { ROUTES } from '@constants/navigation';
 
-type Props = NativeStackScreenProps<MainStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<MainStackParamList, typeof ROUTES.HOME>;
 
 /**
  * The primary entry point of the main application. Presents a typographic
@@ -20,38 +19,17 @@ type Props = NativeStackScreenProps<MainStackParamList, 'Home'>;
  * usual prompt.
  */
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [query, setQuery] = useState('');
-  const hasOnboarded = useUserStore((state: UserState) => state.hasOnboarded);
-  const pantryLastUpdated = useUserStore((state: UserState) => state.pantryLastUpdated);
-  const consecutiveInactiveOpens = useUserStore((state: UserState) => state.consecutiveInactiveOpens);
-  const { incrementInactiveOpens, resetInactiveOpens } = useUserStore((state: UserState) => state.actions);
+  const {
+    isEditing,
+    setIsEditing,
+    query,
+    setQuery,
+    promptText,
+    needsUpdate,
+    submit,
+  } = useHomeScreenData();
 
-
-  const handleSubmit = () => {
-    if (!query.trim()) {
-      return;
-    }
-    // Reset inactive counter because the user engaged
-    resetInactiveOpens();
-    // Mark that a search was performed this session so that AppState
-    // listener does not increment the inactive count on next open.
-    markSearchPerformed();
-    navigation.navigate('Results', { query: query.trim() });
-    setQuery('');
-    setIsEditing(false);
-  };
-
-  // Determine whether to show the Easter egg message
-  const showEasterEgg = consecutiveInactiveOpens >= 3;
-  const promptText = showEasterEgg
-    ? 'The potential in your kitchen remains untapped. We trust you enjoyed your pre-packaged satisfaction.'
-    : 'What do you desire?';
-
-  // Calculate whether the pantry is stale (older than 7 days)
-  const needsUpdate = pantryLastUpdated
-    ? Date.now() - pantryLastUpdated > 7 * 24 * 60 * 60 * 1000
-    : false;
+  const handleSubmit = () => submit((q) => navigation.navigate(ROUTES.RESULTS, { query: q }));
 
   return (
     <ScreenContainer style={styles.container}>
@@ -73,7 +51,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.promptText}>{promptText}</Text>
         )}
       </Pressable>
-      <Pressable style={styles.pantryIconContainer} onPress={() => navigation.navigate('PantryManagement')}>
+      <Pressable style={styles.pantryIconContainer} onPress={() => navigation.navigate(ROUTES.PANTRY_MANAGEMENT)}>
         <Image source={require('../../../assets/app-icon.png')} style={styles.pantryIcon} />
         {needsUpdate && <View style={styles.redDot} />}
       </Pressable>
