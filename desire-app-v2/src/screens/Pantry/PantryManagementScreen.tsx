@@ -12,8 +12,9 @@ import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
 import { useToast } from '@components/common/Toast';
 import { Button } from '@components/common/Button';
+import { ROUTES } from '@constants/navigation';
 
-type Props = NativeStackScreenProps<MainStackParamList, 'PantryManagement'>;
+type Props = NativeStackScreenProps<MainStackParamList, typeof ROUTES.PANTRY_MANAGEMENT>;
 
 /**
  * Screen that allows the user to view and modify their current pantry.
@@ -79,7 +80,7 @@ const PantryManagementScreen: React.FC<Props> = () => {
         <Button label="Add" onPress={handleAdd} style={styles.addButton} />
       </View>
       <ScrollView contentContainerStyle={styles.listContainer}>
-        {items.map((item: string) => (
+        {Object.keys(items).map((item: string) => (
           <View key={item} style={styles.itemRow}>
             <Text style={styles.itemText}>{item}</Text>
             <TouchableOpacity onPress={() => handleRemove(item)}>
@@ -87,7 +88,7 @@ const PantryManagementScreen: React.FC<Props> = () => {
             </TouchableOpacity>
           </View>
         ))}
-        {items.length === 0 && (
+        {Object.keys(items).length === 0 && (
           <Text style={styles.empty}>Your pantry is empty. Start adding items!</Text>
         )}
       </ScrollView>

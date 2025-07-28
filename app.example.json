@@ -34,6 +34,7 @@
     "firebaseProjectId": "<YOUR_PROJECT_ID>",
     "firebaseStorageBucket": "<YOUR_STORAGE_BUCKET>",
     "firebaseMessagingSenderId": "<YOUR_SENDER_ID>",
-    "firebaseAppId": "<YOUR_APP_ID>"
+    "firebaseAppId": "<YOUR_APP_ID>",
+    "spoonacularProxyUrl": "<YOUR_BACKEND_PROXY_URL>"
   }
 }

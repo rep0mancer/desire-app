@@ -9,13 +9,14 @@ import { fonts, sizes } from '@constants/typography';
 import { getAuthInstance } from '@config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@components/common/Toast';
+import { ROUTES } from '@constants/navigation';
 
 /**
  * Screen allowing a new user to create an account. Presents email and
  * password inputs along with a sign up button. Upon successful sign up
  * the authentication listener will redirect to the appropriate flow.
  */
-export type SignUpScreenProps = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
+export type SignUpScreenProps = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.SIGN_UP>;
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -59,7 +60,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         style={styles.input}
       />
       <Button label={isLoading ? 'Signing Up...' : 'Sign Up'} onPress={handleSignUp} style={styles.button} />
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={() => navigation.navigate(ROUTES.LOGIN)}>
         <Text style={styles.linkText}>Already have an account? Sign in</Text>
       </TouchableOpacity>
     </View>
