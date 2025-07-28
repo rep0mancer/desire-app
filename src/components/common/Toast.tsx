@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { Animated, StyleSheet, View, Text } from 'react-native';
 import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
+import { setShowToast } from '@utils/toastService';
 
 /**
  * Context exposing a method to trigger toast messages. Consumers can call
@@ -58,6 +59,11 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return () => clearTimeout(timer);
     }
   }, [message, opacity]);
+
+  // Register the toast function globally when the provider mounts
+  useEffect(() => {
+    setShowToast(showToast);
+  }, [showToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>

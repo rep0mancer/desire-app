@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet, GestureResponderEvent, ViewStyle } from 'react-native';
 import { colors } from '@constants/colors';
-import { fonts, sizes } from '../../constants/typography';
+import { fonts, sizes } from '@constants/typography';
 
 /**
  * Props for the Button component.
@@ -22,8 +22,13 @@ interface ButtonProps {
  */
 export const Button: React.FC<ButtonProps> = ({ label, onPress, style }) => {
   return (
-    <Pressable style={({ pressed }) => [styles.button, style, pressed && styles.pressed]} onPress={onPress}>
-      <Text style={[styles.label, { fontFamily: fonts.heading }]}>{label}</Text>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed }) => [styles.button, style, pressed && styles.pressed]}
+      onPress={onPress}
+    >
+      <Text style={styles.label}>{label}</Text>
     </Pressable>
   );
 };
@@ -34,14 +39,16 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 20,
     alignItems: 'center',
-    borderRadius: 4,
+    // Sharp edges for brutalist aesthetic
+    borderRadius: 0,
   },
   pressed: {
     opacity: 0.8,
   },
   label: {
     color: colors.background,
-    fontFamily: fonts.body,
+    // Use heading font for bold uppercase text
+    fontFamily: fonts.heading,
     fontSize: sizes.body,
     textTransform: 'uppercase',
   },

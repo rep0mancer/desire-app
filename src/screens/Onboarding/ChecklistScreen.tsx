@@ -13,8 +13,9 @@ import type { PantryState } from '@store/pantryStore';
 import { useUserStore } from '@store/userStore';
 import type { UserState } from '@store/userStore';
 import { useToast } from '@components/common/Toast';
+import { ROUTES } from '@constants/navigation';
 
-type Props = NativeStackScreenProps<OnboardingStackParamList, 'Checklist'>;
+type Props = NativeStackScreenProps<OnboardingStackParamList, typeof ROUTES.CHECKLIST>;
 
 /**
  * Screen allowing the user to review and customise the list of pantry items
@@ -47,7 +48,11 @@ const ChecklistScreen: React.FC<Props> = ({ route, navigation }) => {
       await Promise.all(
         selected.map((item) => addItemToPantry(userId, item))
       );
-      pantryActions.setPantry(selected.map((i) => i.toLowerCase()));
+      const pantryObj: Record<string, boolean> = {};
+      selected.forEach((i) => {
+        pantryObj[i.toLowerCase()] = true;
+      });
+      pantryActions.setPantry(pantryObj);
       const timestamp = Date.now();
       await updateUserProfile(userId, {
         onboardingArchetype: archetype,
@@ -55,12 +60,13 @@ const ChecklistScreen: React.FC<Props> = ({ route, navigation }) => {
       });
       await userActions.setOnboardingArchetype(archetype);
       userActions.setPantryLastUpdated(timestamp);
-      await userActions.setHasOnboarded(true);
+      await userActions.setOnboardingStep('finished');
       // Reset inactive opens counter
       userActions.resetInactiveOpens();
-      navigation.reset({ index: 0, routes: [{ name: 'Home' as never }] });
+      navigation.reset({ index: 0, routes: [{ name: ROUTES.HOME as never }] });
     } catch (error) {
-      console.error(error);
+      // Display a user-friendly error via toast; avoid console logging to keep
+      // production builds clean.
       showToast('Failed to save pantry');
     }
   };

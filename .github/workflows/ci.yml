@@ -14,7 +14,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm ci
+          cache: 'npm'
+      - run: npm install --legacy-peer-deps
       - run: npm run lint
       - run: npx tsc --noEmit
       - run: npm run test -- --coverage

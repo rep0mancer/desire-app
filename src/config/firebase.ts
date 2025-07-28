@@ -1,5 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import Constants from 'expo-constants';
 
 /**
@@ -30,4 +31,13 @@ export function initialiseFirestore() {
  */
 export function getDatabase() {
   return getFirestore();
+}
+
+/**
+ * Get the Firebase Auth instance. `initialiseFirestore` (or any Firebase
+ * initialisation) must be called before invoking this function. This is
+ * separated into its own helper to avoid importing `getAuth` everywhere.
+ */
+export function getAuthInstance() {
+  return getAuth();
 }

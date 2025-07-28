@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import Constants from 'expo-constants';
+import { showToast } from '@utils/toastService';
 
 /**
  * Summary information about a recipe returned from the Spoonacular search API.
@@ -22,14 +23,11 @@ export interface RecipeDetails {
   extendedIngredients: Array<{ id: number; name: string; amount: number; unit: string }>;
 }
 
-// Create a configured Axios instance. The API key is provided via expo config.
+// Create a configured Axios instance that points to the backend proxy. The
+// actual Spoonacular API key is stored securely on the server and appended by
+// the proxy function, keeping it out of the client bundle.
 const api: AxiosInstance = axios.create({
-  baseURL: 'https://api.spoonacular.com/',
-  // Note: The API key is sent as a query parameter rather than a header because
-  // the Spoonacular API does not honour custom headers for authentication.
-  params: {
-    apiKey: Constants?.expoConfig?.extra?.spoonacularApiKey,
-  },
+  baseURL: Constants?.expoConfig?.extra?.spoonacularProxyUrl,
 });
 
 /**
@@ -40,15 +38,16 @@ const api: AxiosInstance = axios.create({
  */
 export async function searchRecipes(query: string): Promise<RecipeSummary[]> {
   try {
-    const response = await api.get('recipes/complexSearch', {
+    const response = await api.get('', {
       params: {
+        endpoint: 'recipes/complexSearch',
         query,
         number: 10,
       },
     });
     return response.data.results as RecipeSummary[];
   } catch (error) {
-    console.error('searchRecipes error', error);
+    showToast('Failed to search for recipes');
     throw new Error('Failed to search for recipes');
   }
 }
@@ -61,14 +60,15 @@ export async function searchRecipes(query: string): Promise<RecipeSummary[]> {
  */
 export async function getRecipeDetails(id: number): Promise<RecipeDetails> {
   try {
-    const response = await api.get(`recipes/${id}/information`, {
+    const response = await api.get('', {
       params: {
+        endpoint: `recipes/${id}/information`,
         includeNutrition: false,
       },
     });
     return response.data as RecipeDetails;
   } catch (error) {
-    console.error('getRecipeDetails error', error);
+    showToast('Failed to fetch recipe details');
     throw new Error('Failed to fetch recipe details');
   }
 }

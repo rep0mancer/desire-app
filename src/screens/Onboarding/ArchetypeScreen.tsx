@@ -4,10 +4,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { OnboardingStackParamList } from '@navigation/AppNavigator';
 import { ScreenContainer } from '@components/layout/ScreenContainer';
+import { useUserStore } from '@store/userStore';
 import { colors } from '@constants/colors';
 import { fonts, sizes } from '@constants/typography';
+import { ROUTES } from '@constants/navigation';
 
-type Navigation = NativeStackNavigationProp<OnboardingStackParamList, 'Archetype'>;
+type Navigation = NativeStackNavigationProp<OnboardingStackParamList, typeof ROUTES.ARCHETYPE>;
 
 /**
  * Definition of an archetype used for the lazy setup path. Each archetype has
@@ -63,9 +65,16 @@ const ArchetypeScreen: React.FC = () => {
   const { width } = Dimensions.get('window');
   const cardWidth = width * 0.8;
 
+  const setOnboardingStep = useUserStore((state) => state.actions.setOnboardingStep);
+  const setArchetype = useUserStore((state) => state.actions.setOnboardingArchetype);
+
   const renderItem = ({ item }: { item: Archetype }) => (
     <Pressable
-      onPress={() => navigation.navigate('Checklist', { archetype: item.title, ingredients: item.ingredients })}
+      onPress={() => {
+        setArchetype(item.title);
+        void setOnboardingStep('archetype_selected');
+        navigation.navigate(ROUTES.CHECKLIST, { archetype: item.title, ingredients: item.ingredients });
+      }}
       style={[styles.card, { width: cardWidth }]}
     >
       <ImageBackground source={item.image} style={styles.image} imageStyle={{ borderRadius: 8 }}>
