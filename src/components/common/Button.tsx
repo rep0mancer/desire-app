@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet, GestureResponderEvent, ViewStyle } from 'react-native';
 import { colors } from '@constants/colors';
-import { fonts, sizes } from '@constants/typography';
+import { fonts, sizes } from '../../constants/typography';
 
 /**
  * Props for the Button component.
@@ -23,7 +23,7 @@ interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({ label, onPress, style }) => {
   return (
     <Pressable style={({ pressed }) => [styles.button, style, pressed && styles.pressed]} onPress={onPress}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { fontFamily: fonts.heading }]}>{label}</Text>
     </Pressable>
   );
 };
