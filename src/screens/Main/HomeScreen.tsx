@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TextInput, Image, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TextInput, Pressable, TouchableOpacity } from 'react-native';
+import PantryIcon from '../../components/icons/PantryIcon';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@navigation/AppNavigator';
 import { ScreenContainer } from '@components/layout/ScreenContainer';
@@ -21,17 +22,9 @@ type Props = NativeStackScreenProps<MainStackParamList, 'Home'>;
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [query, setQuery] = useState('');
-  const hasOnboarded = useUserStore((state: UserState) => state.hasOnboarded);
   const pantryLastUpdated = useUserStore((state: UserState) => state.pantryLastUpdated);
   const consecutiveInactiveOpens = useUserStore((state: UserState) => state.consecutiveInactiveOpens);
-  const { incrementInactiveOpens, resetInactiveOpens } = useUserStore((state: UserState) => state.actions);
-
-  useEffect(() => {
-    // Increment inactive opens when the home screen mounts
-    incrementInactiveOpens();
-    // Reset to zero when unmount if user leaves after searching; handled below
-    // We don't need cleanup here
-  }, [incrementInactiveOpens]);
+  const { resetInactiveOpens } = useUserStore((state: UserState) => state.actions);
 
   const handleSubmit = () => {
     if (!query.trim()) {
@@ -51,9 +44,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     : 'What do you desire?';
 
   // Calculate whether the pantry is stale (older than 7 days)
-  const needsUpdate = pantryLastUpdated
+  const showPantryNotification = pantryLastUpdated
     ? Date.now() - pantryLastUpdated > 7 * 24 * 60 * 60 * 1000
     : false;
+
+  const handlePantryPress = () => {
+    navigation.navigate('PantryManagement');
+  };
 
   return (
     <ScreenContainer style={styles.container}>
@@ -75,10 +72,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.promptText}>{promptText}</Text>
         )}
       </Pressable>
-      <Pressable style={styles.pantryIconContainer} onPress={() => navigation.navigate('PantryManagement')}>
-        <Image source={require('../../../assets/app-icon.png')} style={styles.pantryIcon} />
-        {needsUpdate && <View style={styles.redDot} />}
-      </Pressable>
+      <TouchableOpacity onPress={handlePantryPress} style={styles.pantryIconContainer}>
+        <PantryIcon />
+        {showPantryNotification && <View style={styles.notificationDot} />}
+      </TouchableOpacity>
     </ScreenContainer>
   );
 };
@@ -115,11 +112,7 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
   },
-  pantryIcon: {
-    width: 32,
-    height: 32,
-  },
-  redDot: {
+  notificationDot: {
     position: 'absolute',
     top: -4,
     right: -4,
